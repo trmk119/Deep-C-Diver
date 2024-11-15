@@ -1,0 +1,125 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <limits.h>
+#include <string.h>
+
+#define MAX_NODES 20
+
+int graph[MAX_NODES][MAX_NODES];
+int dist[MAX_NODES];
+int visited[MAX_NODES];
+int prev[MAX_NODES];
+
+char station_names[MAX_NODES][30];
+int station_count = 0;
+
+void init_graph() {
+    for (int i = 0; i < MAX_NODES; i++) {
+        for (int j = 0; j < MAX_NODES; j++) {
+            if (i == j) {
+                graph[i][j] = 0;
+            }
+            else {
+                graph[i][j] = INT_MAX;
+            }
+        }
+    }
+
+
+    graph[0][1] = 24; graph[1][0] = 24;
+    graph[1][2] = 4; graph[2][1] = 4;
+    graph[2][3] = 1; graph[3][2] = 1;
+    graph[3][4] = 9; graph[4][3] = 9;
+
+    graph[6][7] = 10; graph[7][6] = 10;
+    graph[7][8] = 6; graph[8][7] = 6;
+}
+
+void dijkstra(int start) {
+    for (int i = 0; i < MAX_NODES; i++) {
+        dist[i] = INT_MAX;
+        visited[i] = 0;
+        prev[i] = -1;
+    }
+
+    dist[start] = 0;
+
+    for (int count = 0; count < MAX_NODES; count++) {
+        int u = -1;
+        for (int i = 0; i < MAX_NODES; i++) {
+            if (!visited[i] && (u == -1 || dist[i] < dist[u])) {
+                u = i;
+            }
+        }
+
+        if (u == -1) break;
+
+        visited[u] = 1;
+
+        for (int v = 0; v < MAX_NODES; v++) {
+            if (graph[u][v] != INT_MAX && dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+                prev[v] = u;
+            }
+        }
+    }
+}
+
+int main() {
+
+    strcpy(station_names[0], "다대포해수욕장");
+    strcpy(station_names[1], "서면");
+    strcpy(station_names[2], "연산");
+    strcpy(station_names[3], "교대");
+    strcpy(station_names[4], "동래");
+    strcpy(station_names[5], "노포");
+    station_count = 6;
+
+    init_graph();
+
+
+    char start_name[30], end_name[30];
+    printf("출발역을 입력하세요: ");
+    scanf("%s", start_name);
+    printf("도착역을 입력하세요: ");
+    scanf("%s", end_name);
+
+    int start = -1, end = -1;
+    for (int i = 0; i < station_count; i++) {
+        if (strcmp(start_name, station_names[i]) == 0) {
+            start = i;
+        }
+        if (strcmp(end_name, station_names[i]) == 0) {
+            end = i;
+        }
+    }
+
+    if (start == -1 || end == -1) {
+        printf("유효하지 않은 역 이름입니다.\n");
+        return 0;
+    }
+
+    dijkstra(start);
+
+    if (dist[end] == INT_MAX) {
+        printf("목적지까지 도달할 수 없습니다.\n");
+    }
+    else {
+        printf("최단 거리: %d\n", dist[end]);
+        printf("경로: ");
+
+        int path[MAX_NODES];
+        int path_length = 0;
+
+        for (int v = end; v != -1; v = prev[v]) {
+            path[path_length++] = v;
+        }
+
+        for (int i = path_length - 1; i >= 0; i--) {
+            printf("%s ", station_names[path[i]]);
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
