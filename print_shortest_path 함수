@@ -1,0 +1,25 @@
+void print_shortest_path(int start, int end) {
+    if (dist[end] == INT_MAX) {
+        printf("목적지에 도달할 수 없습니다.\n");
+        return;
+    }
+
+    printf("추천 경로: ");
+    int path[MAX_NODES];
+    int path_length = 0;
+
+    for (int v = end; v != -1; v = prev[v]) {
+        path[path_length++] = v;
+    }
+
+    double total_time = 0;
+
+    for (int i = path_length - 1; i >= 0; i--) {
+        printf("%s ", stations[path[i]].name);
+        if (i > 0) {
+            int travel_time = graph[path[i]][path[i - 1]];
+            total_time += travel_time * TIME_PER_WEIGHT;
+        }
+    }
+    printf("\n소요 시간: %.2f분\n", total_time);
+}
