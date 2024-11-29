@@ -1,0 +1,8 @@
+int get_station_index(char station_name[14]) {
+    for (int i = 0; i < station_count; i++) {
+        if (strcmp(station_name, stations[i].name) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
